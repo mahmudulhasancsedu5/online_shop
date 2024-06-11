@@ -92,6 +92,7 @@ class DataStoreModel implements StoreDB {
   
   @override
   List<Product> getProductsOf(String category) {
+    if(category == 'All') return getProducts();
     List<Product> newItemList = [];
     int numOfItem = items.length;
     for(int i = 0; i < numOfItem; i++) {

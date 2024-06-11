@@ -1,50 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop/model/data_store.dart';
+import 'package:online_shop/provider_models/category_model.dart';
+import 'package:online_shop/provider_models/products_model.dart';
+import 'package:provider/provider.dart';
 
-typedef ProductCategorySelectCallback = Function(int);
-typedef ProductCategoryMenuSelectCallback = Function(int, String);
 
-class ProductCategoryDrawer extends StatefulWidget {
+
+class ProductCategoryDrawer extends StatelessWidget {
   late List<String> categories;
-  final int selectedCategory;
-  final ProductCategoryMenuSelectCallback onMenuSelect;
-  ProductCategoryDrawer({super.key, required this.selectedCategory, required this.onMenuSelect}) {
+  ProductCategoryDrawer({super.key}) {
     categories = DataStoreModel().getProductCategories();
   }
 
   @override
-  State<ProductCategoryDrawer> createState() => _ProductCategoryDrawerState();
-}
-
-class _ProductCategoryDrawerState extends State<ProductCategoryDrawer> {
-  int _selectedItem = -1;
-
-  void _onItemSelect(int index){
-    setState(() {
-      _selectedItem = index;
-      widget.onMenuSelect(_selectedItem, widget.categories[index]);
-    });
-  }
-  @override
   Widget build(BuildContext context) {
-    if(_selectedItem == -1) _selectedItem = widget.selectedCategory;
-
     return Drawer(
       child: ListView(
-        children: _getCategoryWidgets(),
+        children: _getCategoryWidgets(context),
       ),
     );
   }
 
-  List<Widget> _getCategoryWidgets() {
+  List<Widget> _getCategoryWidgets(BuildContext context) {
     Widget drawerHeader = const DrawerHeader(child: Text('Category'));
     List<Widget> categoryList = [drawerHeader];
-    categoryList.addAll(widget.categories.asMap().keys.map((index) {
+    categoryList.addAll(categories.asMap().keys.map((index) {
       return _ProductCategoryWidget(
-        categoryName: widget.categories[index],
-        isSelected: _selectedItem == index,
+        categoryName: categories[index],
         index: index,
-        onTapItem: _onItemSelect,
       );
     }));
 
@@ -52,26 +35,26 @@ class _ProductCategoryDrawerState extends State<ProductCategoryDrawer> {
   }
 }
 
+
 class _ProductCategoryWidget extends StatelessWidget {
   _ProductCategoryWidget({
     super.key,
     required this.categoryName,
-    required this.isSelected,
     required this.index,
-    required this.onTapItem,
   });
   final String categoryName;
   final int index;
-  final bool isSelected;
-  ProductCategorySelectCallback onTapItem;
 
   @override
   Widget build(BuildContext context) {
+    var selectModel = context.read<SelectedCategoryModel>();
+    var productsModel = context.read<ProductsChangeModel>();
     return ListTile(
       title: Text(categoryName),
-      selected: isSelected,
+      selected: selectModel.selectedCategoryIndex == index,
       onTap: () {
-        onTapItem(index);
+        selectModel.setCategory(index, categoryName);
+        productsModel.reloadProducts(DataStoreModel().getProductsOf(categoryName));
         Navigator.pop(context);
       },
     );
