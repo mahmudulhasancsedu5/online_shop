@@ -9,7 +9,6 @@ abstract class StoreDB {
 class DataStoreModel implements StoreDB {
   String desc =
       "Bring a touch of tradition to your wardrobe with this Premium Panjabi. Made from 100% soft and breathable cotton, it is perfect for any occasion. The Panjabi features gorgeous designs, adding a touch of elegance to the simple yet sophisticated design. The beige color is neutral and versatile, making it easy to style. With a comfortable regular fit, it is both practical and stylish. Available in sizes 38 to 46, youre sure to find the perfect size for you.";
-  String a = "";
   late List<Product> items = [];
 
   List<String> categories = [
@@ -38,6 +37,10 @@ class DataStoreModel implements StoreDB {
       rating: 4.0,
       isInSale: true,
       availableSize: ['38', '40', '42', '44', '46'],
+      previewImages: [
+        'assets/images/panjabi/panjabi_brown.jpeg',
+        'assets/images/panjabi/panjabi_green.jpeg',
+      ],
     );
 
     var shirt = Product(
@@ -52,6 +55,11 @@ class DataStoreModel implements StoreDB {
       rating: 4.0,
       isInSale: true,
       availableSize: ['38', '40', '42', '44', '46'],
+      previewImages: [
+        'assets/images/shirt/shirt_check.jpeg',
+        'assets/images/shirt/shirt_red.jpeg',
+        'assets/images/shirt/shirt_black.jpeg'
+      ],
     );
 
     var pant = Product(
@@ -66,6 +74,11 @@ class DataStoreModel implements StoreDB {
       rating: 4.0,
       isInSale: true,
       availableSize: ['38', '40', '42', '44', '46'],
+      previewImages: [
+        'assets/images/pant/pant_black.jpeg',
+        'assets/images/pant/pant_ash.jpeg',
+        'assets/images/pant/pant_blue.jpeg'
+      ],
     );
 
     List<Product> panjabies = List.filled(20, sampleProduct);
@@ -78,8 +91,6 @@ class DataStoreModel implements StoreDB {
     items.shuffle();
   }
 
-
-
   @override
   List<Product> getProducts() {
     return items;
@@ -89,14 +100,14 @@ class DataStoreModel implements StoreDB {
   List<String> getProductCategories() {
     return categories;
   }
-  
+
   @override
   List<Product> getProductsOf(String category) {
-    if(category == 'All') return getProducts();
+    if (category == 'All') return getProducts();
     List<Product> newItemList = [];
     int numOfItem = items.length;
-    for(int i = 0; i < numOfItem; i++) {
-      if(items[i].category == category) {
+    for (int i = 0; i < numOfItem; i++) {
+      if (items[i].category == category) {
         newItemList.add(items[i]);
       }
     }

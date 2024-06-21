@@ -10,6 +10,7 @@ class Product {
   final double rating;
   final bool isInSale;
   final List<String> availableSize;
+  final List<String> previewImages;
 
   const Product({
     required this.productCode,
@@ -23,5 +24,6 @@ class Product {
     required this.rating,
     required this.isInSale,
     required this.availableSize,
+    required this.previewImages,
   });
 }

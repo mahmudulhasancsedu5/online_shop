@@ -3,6 +3,8 @@ import 'package:online_shop/model/product_model.dart';
 import 'package:online_shop/view/product_card.dart';
 import 'package:online_shop/view/product_order_count.dart';
 
+typedef PreviewImageCallback = Function(String);
+
 class ProductDetailInfo extends StatefulWidget {
   final Product product;
   const ProductDetailInfo({super.key, required this.product});
@@ -13,6 +15,15 @@ class ProductDetailInfo extends StatefulWidget {
 
 class _ProductDetailInfoState extends State<ProductDetailInfo> {
   int _selectedSize = 0;
+  String? _selectedImage = null;
+
+  void _onSelectImage(String image) {
+    print('image: $image');
+    setState(() {
+      _selectedImage = image;
+    });
+  }
+
   @override
   void _onTapAvilableSize(int index) {
     setState(() {
@@ -21,6 +32,8 @@ class _ProductDetailInfoState extends State<ProductDetailInfo> {
   }
 
   Widget build(BuildContext context) {
+    if (_selectedImage == null) _selectedImage = widget.product.image;
+
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
@@ -35,9 +48,13 @@ class _ProductDetailInfoState extends State<ProductDetailInfo> {
               Card(
                 clipBehavior: Clip.antiAlias,
                 child: Image.asset(
-                  widget.product.image,
+                  _selectedImage!,
                   fit: BoxFit.cover,
                 ),
+              ),
+              PreviewProductImages(
+                images: widget.product.previewImages,
+                callback: _onSelectImage,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 20),
@@ -76,7 +93,11 @@ class _ProductDetailInfoState extends State<ProductDetailInfo> {
                           .toList()
                           .map((index) {
                         return OutlinedButton(
-                            style: ButtonStyle(backgroundColor: MaterialStatePropertyAll((_selectedSize == index)?Colors.blue:Colors.white)),
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(
+                                    (_selectedSize == index)
+                                        ? Colors.blue
+                                        : Colors.white)),
                             onPressed: () {
                               _onTapAvilableSize(index);
                             },
@@ -86,7 +107,7 @@ class _ProductDetailInfoState extends State<ProductDetailInfo> {
                   ],
                 ),
               ),
-              ProductOrderCount(callback: (val){
+              ProductOrderCount(callback: (val) {
                 print('Number of order: $val');
               }),
               Padding(
@@ -110,5 +131,66 @@ class _ProductDetailInfoState extends State<ProductDetailInfo> {
         ),
       ),
     ));
+  }
+}
+
+class PreviewProductImages extends StatefulWidget {
+  final List<String> images;
+  final PreviewImageCallback callback;
+  const PreviewProductImages(
+      {super.key, required this.images, required this.callback});
+
+  @override
+  State<PreviewProductImages> createState() => _PreviewProductImagesState();
+}
+
+class _PreviewProductImagesState extends State<PreviewProductImages> {
+  String? _selectedImage = null;
+
+  void _onSelectPreviewImage(String image) {
+    print(image);
+    setState(() {
+      _selectedImage = image;
+      widget.callback(image);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color previewImageBorderColor = Theme.of(context).colorScheme.secondary;
+    if (_selectedImage == null) _selectedImage = widget.images.first;
+
+    List<Widget> previeqImages = widget.images.map((imagePath) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.0),
+        child: GestureDetector(
+          onTap: () {
+            _onSelectPreviewImage(imagePath);
+          },
+          child: Container(
+            height: 100,
+            width: 100,
+            padding: EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              border: (_selectedImage == imagePath)
+                  ? Border.all(width: 2, color: previewImageBorderColor)
+                  : null,
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.fill,
+            ),
+          ),
+        ),
+      );
+    }).toList();
+    return Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: previeqImages,
+      ),
+    );
   }
 }
